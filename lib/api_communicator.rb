@@ -11,9 +11,8 @@ end
 
 def get_character_hash(character)
   all_character_array = get_all_characters
-  this_character_hash = all_character_array.find {|character_hash| character_hash["name"].downcase == character} :
+  this_character_hash = all_character_array.find {|character_hash| character_hash["name"] == character}
 end
-
 
 
 def parse_character_movies(array_of_film_hashes)
