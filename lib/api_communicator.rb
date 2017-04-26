@@ -9,37 +9,23 @@ def get_all_characters
   all_character_array = JSON.parse(all_characters)["results"]
 end
 
-def get_character_films(character)
+def get_character_hash(character)
   all_character_array = get_all_characters
-  this_character_hash = all_character_array.find {|character_hash| character_hash["name"].downcase == character}
-  film_array = this_character_hash["films"]
+  this_character_hash = all_character_array.find {|character_hash| character_hash["name"].downcase == character} :
 end
 
-def get_character_movies_from_api(character)
-  #make the web request
-  film_array = get_character_films(character)
-  film_info_array = film_array.collect {|film_url| JSON.parse(RestClient.get(film_url))}
 
 
-  # iterate over the character hash to find the collection of `films` for the given
-  #   `character`
-  # collect those film API urls, make a web request to each URL to get the info
-  #  for that film
-  # return value of this method should be collection of info about each film.
-  #  i.e. an array of hashes in which each hash reps a given film
-  # this collection will be the argument given to `parse_character_movies`
-  #  and that method will do some nice presentation stuff: puts out a list
-  #  of movies by title. play around with puts out other info about a given film.
-end
-
-def parse_character_movies(films_hash)
+def parse_character_movies(array_of_film_hashes)
   # some iteration magic and puts out the movies in a nice list
-  films_hash.each {|film| puts film["title"]}
+  array_of_film_hashes.each {|film| puts film.title}
 end
 
-def show_character_movies(character)
-  films_hash = get_character_movies_from_api(character)
-  parse_character_movies(films_hash)
+
+def show_character_movies(character) #change to pass character Object
+  character_object = Character.new(get_character_hash(character))
+
+  parse_character_movies(character_object.movies)
 end
 
 ## BONUS
@@ -57,7 +43,19 @@ class Character
   end
 
   def movies
-    @character_info["films"]
+    film_urls = @character_info["films"]
+    film_urls.collect {|film_url| Movie.new(film_url)}
   end
 
+end
+
+class Movie
+
+  def initialize(film_url)
+    @film_hash = JSON.parse(RestClient.get(film_url))
+  end
+
+  def title
+    @film_hash["title"]
+  end
 end
